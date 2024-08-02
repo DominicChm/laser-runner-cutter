@@ -1,4 +1,5 @@
 from aioros2.launch_driver import LaunchNode
+
 from amiga_control import amiga_control_node
 from furrow_perceiver import realsense_stub
 from furrow_perceiver import furrow_perceiver_node
@@ -94,6 +95,7 @@ def generate_launch_description():
     video_server = launch_ros.actions.Node(
         package="web_video_server", executable="web_video_server", name="wvs"
     )
+    print(type( brain))
 
     # Link nodes
     brain.perceiver.link(furrow_perc0)

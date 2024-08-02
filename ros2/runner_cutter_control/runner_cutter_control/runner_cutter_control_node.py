@@ -25,10 +25,12 @@ from aioros2 import (
     service,
     start,
     topic,
+    import_node
 )
-from camera_control.camera_control_node import CameraControlNode
+import camera_control.camera_control_node
+import laser_control.laser_control_node
+
 from common_interfaces.msg import Vector2
-from laser_control.laser_control_node import LaserControlNode
 from runner_cutter_control.calibration import Calibration
 from runner_cutter_control.camera_context import CameraContext
 from runner_cutter_control.tracker import Track, Tracker, TrackState
@@ -52,6 +54,9 @@ class RunnerCutterControlParams:
 
 @node("runner_cutter_control_node")
 class RunnerCutterControlNode:
+    laser_node = import_node(laser_control.laser_control_node)
+    camera_node = import_node(camera_control.camera_control_node)
+
     runner_cutter_control_params = params(RunnerCutterControlParams)
     state_topic = topic(
         "~/state",
@@ -62,24 +67,18 @@ class RunnerCutterControlNode:
             durability=QoSDurabilityPolicy.RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL,
         ),
     )
-
+    
     @start
     async def start(self):
-        self.laser_node = ClientDriver(
-            LaserControlNode(), self, self.runner_cutter_control_params.laser_node_name
-        )
-        self.camera_node = ClientDriver(
-            CameraControlNode(),
-            self,
-            self.runner_cutter_control_params.camera_node_name,
-        )
         self.calibration = Calibration(
             self.laser_node,
             self.camera_node,
             self.runner_cutter_control_params.tracking_laser_color,
             self.get_logger(),
         )
+
         self.runner_tracker = Tracker(self.get_logger())
+
         self.state_machine = StateMachine(
             self,
             self.laser_node,
@@ -203,8 +202,8 @@ class StateMachine:
     def __init__(
         self,
         node: RunnerCutterControlNode,
-        laser_node: LaserControlNode,
-        camera_node: CameraControlNode,
+        laser_node: "laser_control.laser_control_node.LaserControlNode",
+        camera_node: "camera_control.camera_control_node.CameraControlNode",
         calibration: Calibration,
         runner_tracker: Tracker,
         tracking_laser_color: Tuple[float, float, float],

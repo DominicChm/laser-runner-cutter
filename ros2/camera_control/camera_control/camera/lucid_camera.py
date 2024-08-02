@@ -10,8 +10,8 @@ from typing import Callable, Optional, Tuple
 import cv2
 import numpy as np
 from ament_index_python.packages import get_package_share_directory
-from arena_api.enums import PixelFormat
-from arena_api.system import system
+# from arena_api.enums import PixelFormat
+# from arena_api.system import system
 
 from .calibration import (
     construct_extrinsic_matrix,
