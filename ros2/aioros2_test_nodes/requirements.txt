@@ -1,0 +1,2 @@
+-e ../aioros2 --config-settings editable_mode=strict
+farm-ng-amiga

@@ -1,5 +1,10 @@
+import inspect
 import re
 import traceback
+from types import ModuleType
+from rclpy.logging import LoggingSeverity
+
+from aioros2.directives._decorators import RosDirective
 # Decorate sync callbacks to catch errors into the specified print function.
 def catch(log_fn, return_val=None):
     def _catch(fn):
@@ -8,7 +13,7 @@ def catch(log_fn, return_val=None):
                 return fn(*args, **kwargs)
             
             except Exception:
-                log_fn(traceback.format_exc())
+                log_fn(traceback.format_exc(), LoggingSeverity.ERROR)
                 return return_val
 
         return _safe_exec
@@ -25,3 +30,22 @@ def to_snake(camel_str):
     camel_str = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", camel_str)
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", camel_str).lower()
 
+def get_caller_module(skip=0):
+    stack = inspect.stack()
+
+    start_idx = 2 + skip # Always omit this function and the calling function from the stack.
+    caller_frame = stack[start_idx][0]
+
+    caller_module = inspect.getmodule(caller_frame)
+
+    return caller_module
+
+def get_module_ros_directives(d):
+    if isinstance(d, ModuleType):
+        d = d.__dict__
+
+    return [
+        d[k]
+        for k in d
+        if not k.startswith("__") and isinstance(d[k], RosDirective)
+    ]

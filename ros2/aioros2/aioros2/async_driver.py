@@ -5,16 +5,16 @@ import types
 import rclpy
 from typing import List
 
-from .decorators import RosDefinition
-from .decorators.service import RosService
-from .decorators.topic import RosTopic
-from .decorators.subscribe import RosSubscription
-from .decorators.import_node import RosImport
-from .decorators.action import RosAction
-from .decorators.timer import RosTimer
-from .decorators.params import RosParams
-from .decorators.param_subscription import RosParamSubscription
-from .decorators.start import RosStart
+from .directives import RosDirective
+from .directives.service import RosService
+from .directives.topic import RosTopic
+from .directives.subscribe import RosSubscription
+from .directives.import_node import RosImport
+from .directives.action import RosAction
+from .directives.timer import RosTimer
+from .directives.params import RosParams
+from .directives.param_subscription import RosParamSubscription
+from .directives.start import RosStart
 from collections import OrderedDict
 
 

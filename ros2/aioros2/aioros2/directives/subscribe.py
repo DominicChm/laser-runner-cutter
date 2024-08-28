@@ -1,10 +1,10 @@
 from typing import Any, Union
-from ._decorators import RosDefinition
+from ._decorators import RosDirective
 from .topic import RosTopic
 from rclpy.expand_topic_name import expand_topic_name
 
 
-class RosSubscription(RosDefinition):
+class RosSubscription(RosDirective):
     def raw_topic(namespace, idl, qos_queue, server_handler):
         return RosSubscription(RosTopic(namespace, idl, qos_queue), server_handler)
 

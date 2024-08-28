@@ -1,6 +1,6 @@
-from ._decorators import RosDefinition
+from ._decorators import RosDirective
 
-class RosParam(RosDefinition):
+class RosParam(RosDirective):
     def __init__(self, *args):
         # self._desc = ParameterDescriptor()
         pass

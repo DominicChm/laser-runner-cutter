@@ -5,8 +5,7 @@ from .timer import timer
 from .subscribe import subscribe
 from .topic import topic, QOS_LATCHED
 from .params import params
-from ._decorators import RosDefinition, idl_to_kwargs
-from .node import node, RosNode
+from ._decorators import RosDirective, idl_to_kwargs
 from .param import param
 from .start import start
 

@@ -1,5 +1,5 @@
 from typing import Any, Union
-from ._decorators import RosDefinition
+from ._decorators import RosDirective
 from rclpy.qos import (
     QoSProfile,
     QoSDurabilityPolicy,
@@ -12,7 +12,7 @@ QOS_LATCHED = QoSProfile(
     durability=QoSDurabilityPolicy.RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL,
 )
 
-class RosTopic(RosDefinition):
+class RosTopic(RosDirective):
     def __init__(
         self, namespace: str, msg_idl: Any, qos: Union[QoSProfile, int]
     ) -> None:

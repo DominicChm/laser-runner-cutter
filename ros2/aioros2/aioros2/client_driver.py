@@ -9,15 +9,15 @@ from rclpy.expand_topic_name import expand_topic_name
 
 from . import server_driver
 from .async_driver import AsyncDriver
-from .decorators.action import RosAction
-from .decorators.import_node import RosImport
-from .decorators.params import RosParams
-from .decorators.service import RosService
-from .decorators.subscribe import RosSubscription
-from .decorators.timer import RosTimer
-from .decorators.topic import RosTopic
-from .decorators.start import RosStart
-
+from .directives.action import RosAction
+from .directives.import_node import RosImport
+from .directives.params import RosParams
+from .directives.service import RosService
+from .directives.subscribe import RosSubscription
+from .directives.timer import RosTimer
+from .directives.topic import RosTopic
+from .directives.start import RosStart
+from .deferrable import resolve_deferrable
 # Extend RosTopic for downstream references
 class CachedSubscription(RosTopic):
     def __init__(self, topic: RosTopic, client: "ClientDriver"):
@@ -80,6 +80,7 @@ class ClientDriver(AsyncDriver):
     ):
         self._node: "server_driver.ServerDriver" = server_node
 
+        resolve_deferrable(node_def, self)
 
         if logger is None:
             logger = rclpy.logging.get_logger(self._get_logger_name(node_name, node_namespace))
@@ -144,7 +145,11 @@ class ClientDriver(AsyncDriver):
         node_def = ros_import.resolve()
 
         # Create a new clientdriver for this node
-        return ClientDriver(node_def, self._node, import_name, import_ns)
+        c = ClientDriver(ros_import, self._node, import_name, import_ns)
+
+        resolve_deferrable(ros_import, c)
+        
+        return c
 
     def _attach_publisher(self, attr, topic: RosTopic):
         topic.node = self # Set topic node in definition so other attachers know about it.

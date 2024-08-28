@@ -1,5 +1,5 @@
 from typing import TypeVar
-from ._decorators import RosDefinition
+from ._decorators import RosDirective
 import dataclasses
 from .deferrable_accessor import DeferrableAccessor
 
@@ -23,7 +23,7 @@ class RosParamReference:
     def value():
         pass
 
-class RosParams(RosDefinition, DeferrableAccessor):
+class RosParams(RosDirective, DeferrableAccessor):
     def __init__(self, params_dclass) -> None:
         self.params_class = params_dclass
 

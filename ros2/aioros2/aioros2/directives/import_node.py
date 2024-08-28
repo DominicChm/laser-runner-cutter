@@ -1,11 +1,10 @@
 from types import ModuleType
 from typing import Optional
-from ._decorators import RosDefinition
-from .node import RosNode
+from ._decorators import RosDirective
 from .deferrable_accessor import DeferrableAccessor
 
 
-class RosImport(RosDefinition, DeferrableAccessor):
+class RosImport(RosDirective, DeferrableAccessor):
     def __init__(
         self,
         module,

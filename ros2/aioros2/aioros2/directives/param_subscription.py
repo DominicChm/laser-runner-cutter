@@ -1,8 +1,8 @@
 from typing import List
-from ._decorators import RosDefinition
+from ._decorators import RosDirective
 from .params import RosParamReference
 
-class RosParamSubscription(RosDefinition):
+class RosParamSubscription(RosDirective):
     def __init__(self, handler, param_references):
         self.references: List[RosParamReference] = param_references
         self.handler = handler
