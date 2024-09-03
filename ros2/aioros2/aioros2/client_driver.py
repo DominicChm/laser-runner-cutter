@@ -10,7 +10,7 @@ from rclpy.expand_topic_name import expand_topic_name
 from . import server_driver
 from .async_driver import AsyncDriver
 from .directives.action import RosAction
-from .directives.import_node import RosImport
+from .directives.use_node import RosImport
 from .directives.params import RosParams
 from .directives.service import RosService
 from .directives.subscribe import RosSubscription

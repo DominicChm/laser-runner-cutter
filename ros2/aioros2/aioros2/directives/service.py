@@ -5,12 +5,13 @@ from aioros2.returnable import marshal_returnable_to_idl
 from aioros2.util import catch
 from ._decorators import RosDirective, idl_to_kwargs
 from rclpy.node import Node
+from ..deferrable import Deferrable
 
 # https://stackoverflow.com/questions/11731136/class-method-decorator-with-self-arguments
 
 
 class RosService(RosDirective):
-    def __init__(self, path, idl, fn):
+    def __init__(self, path: Deferrable, idl, fn):
         if not hasattr(idl, "Request"):
             raise TypeError("Passed object is not a service-compatible IDL object! Make sure it isn't a topic or action IDL.")
         
@@ -44,8 +45,7 @@ class RosService(RosDirective):
     def __call__(self, *args: any, **kwds: any) -> any:
         return self._fn(*args, **kwds)
     
-    def implement_server(self, node: Node, loop):
-
+    def implement_server(self, node: Node, nodeinfo, loop):
         @catch(node.get_logger().log, self._idl.Response())
         def cb(req, result):
             kwargs = idl_to_kwargs(req)
@@ -58,13 +58,16 @@ class RosService(RosDirective):
             
             return marshal_returnable_to_idl(user_return, self._idl.Response)
 
-        node.create_service(self._idl, self._path, cb)
+        print(self._path.resolve())
+        # node.create_service(self._idl, self._path, cb)
     
-    def implement_client(self, node: Node, loop):
+    def implement_client(self, nodeinfo, loop):
         pass
 
 # Decorator
 def service(path, srv_idl):
+    path = Deferrable(path)
+    
     def _service(fn):
         return RosService(path, srv_idl, fn)
 

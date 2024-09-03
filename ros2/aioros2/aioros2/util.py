@@ -44,6 +44,9 @@ def get_module_ros_directives(d):
     if isinstance(d, ModuleType):
         d = d.__dict__
 
+    if not isinstance(d, dict):
+        return []
+    
     return [
         d[k]
         for k in d

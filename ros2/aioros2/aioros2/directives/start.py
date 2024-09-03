@@ -12,10 +12,10 @@ class RosStart(RosDirective):
     def __call__(self, *args: any, **kwds: any) -> any:
         return self.fn(*args, **kwds)
 
-    def implement_server(self, node, loop):
+    def implement_server(self, node, nodeinfo, loop):
         loop.create_task(self.fn())
 
-    def implement_client(self, node, loop):
+    def implement_client(self, node, nodeinfo, loop):
         pass
 
 

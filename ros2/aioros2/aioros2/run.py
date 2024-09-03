@@ -3,7 +3,7 @@ import inspect
 import threading
 from types import ModuleType
 from typing import Optional
-from .directives._decorators import RosDirective
+from .directives._decorators import RosDirective, NodeInfo
 from aioros2.util import get_caller_module, get_module_ros_directives
 from aioros2.AioRos2Exception import AioRos2Exception
 import asyncio
@@ -29,7 +29,7 @@ def run(num_threads: Optional[int] = None):
         )
 
     for d in directives:
-        d.implement_server(node, loop)
+        d.implement_server(node, NodeInfo(None, None), loop)
 
     loop.create_task(_spin([node], num_threads))
 

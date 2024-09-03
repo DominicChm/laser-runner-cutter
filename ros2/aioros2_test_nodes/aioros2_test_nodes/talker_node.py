@@ -1,9 +1,14 @@
-import aioros2.patch_import
 from std_srvs.srv import Trigger
 from dataclasses import dataclass
 import aioros2
 
-from . import other_node as onode, talker_node as tnode
+from . import other_node
+
+#  colcon build --packages-select aioros2_test_nodes --symlink-install && ros2 run aioros2_test_nodes talk --ros-args -p "onode.name:=onode" -p "onode.namespace:=/"
+
+onode = aioros2.use(other_node)
+onode1 = aioros2.use(other_node)
+
 @dataclass
 class TalkerParams:
     amiga_host: str = "10.95.76.1"
@@ -20,7 +25,9 @@ async def start():
     pass
     # other_t1.set_twist()
 
-# @subscribe(other_node.a_topic)
+@aioros2.subscribe(onode.a_topic)
+def on_a_topic(data):
+    print("GOT")
 
 @aioros2.service("~/start", Trigger)
 async def start_lel() -> bool:

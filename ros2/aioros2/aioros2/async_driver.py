@@ -9,7 +9,7 @@ from .directives import RosDirective
 from .directives.service import RosService
 from .directives.topic import RosTopic
 from .directives.subscribe import RosSubscription
-from .directives.import_node import RosImport
+from .directives.use_node import RosImport
 from .directives.action import RosAction
 from .directives.timer import RosTimer
 from .directives.params import RosParams

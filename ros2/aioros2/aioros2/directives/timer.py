@@ -15,7 +15,7 @@ class RosTimer(RosDirective):
     def __call__(self, *args: any, **kwds: any) -> any:
         return self.fn(*args, **kwds)
 
-    def implement_server(self, node: rclpy.node.Node, loop: asyncio.BaseEventLoop):
+    def implement_server(self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop):
         # To prevent concurrent exec, use ros2 callback groups
         if self.allow_concurrent_execution:
             cbg = ReentrantCallbackGroup()
@@ -29,7 +29,7 @@ class RosTimer(RosDirective):
         node.create_timer(self.interval, _timer_callback, callback_group=cbg)
 
     # Don't run server-specific code on clients.
-    def implement_client(self, node, loop):
+    def implement_client(self, node, nodeinfo, loop):
         pass
 
 

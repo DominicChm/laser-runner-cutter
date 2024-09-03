@@ -1,7 +1,6 @@
 from typing import TypeVar
 from ._decorators import RosDirective
 import dataclasses
-from .deferrable_accessor import DeferrableAccessor
 
 class RosParamReference:
     prefix = None
