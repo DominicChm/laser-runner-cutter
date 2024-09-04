@@ -1,3 +1,4 @@
+import importlib
 import inspect
 import re
 import traceback
@@ -5,6 +6,7 @@ from types import ModuleType
 from rclpy.logging import LoggingSeverity
 
 from aioros2.directives._decorators import RosDirective
+
 # Decorate sync callbacks to catch errors into the specified print function.
 def catch(log_fn, return_val=None):
     def _catch(fn):
@@ -52,3 +54,25 @@ def get_module_ros_directives(d):
         for k in d
         if not k.startswith("__") and isinstance(d[k], RosDirective)
     ]
+
+
+# https://stackoverflow.com/a/57249901/16238567
+def duplicate_module(module):
+    fullname = module.__name__
+    spec = importlib.util.find_spec(fullname)
+    clone = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(clone)
+
+    return clone
+
+def marshal_to_idl(idl, *args, **kwargs):
+    # If passed an already instantiated IDL object
+    # return that.
+    if len(args) == 1 and isinstance(args[0], idl):
+        return idl
+
+    # Handle dictionary params.
+    elif len(args) == 1 and isinstance(args[0], dict):
+        return idl(**args[0])
+    
+    return idl(**kwargs)

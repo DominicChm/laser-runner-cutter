@@ -4,6 +4,7 @@ from .service import service
 from .timer import timer
 from .subscribe import subscribe
 from .topic import topic, QOS_LATCHED
+from ._decorators import NodeInfo
 # from .params import params
 # from ._decorators import RosDirective, idl_to_kwargs
 # from .param import param

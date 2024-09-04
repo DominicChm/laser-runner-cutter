@@ -28,7 +28,8 @@ setup(
     tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "talk = aioros2_test_nodes.talker_node:main",
+            "talker_node = aioros2_test_nodes.talker_node:main",
+            "other_node = aioros2_test_nodes.other_node:main",
         ],
     },
 )

@@ -14,7 +14,6 @@ class RosSubscription(RosDirective):
         self.fn = fn
 
     def implement_server(self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop):
-        print(self.topic.aname)
         t = self.topic.resolve()
 
         if type(t) == str:

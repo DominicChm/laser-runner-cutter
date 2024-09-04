@@ -2,7 +2,7 @@ import importlib
 from types import ModuleType
 from typing import Optional, TypeVar
 
-from ..util import get_module_ros_directives
+from ..util import get_module_ros_directives, duplicate_module
 from ._decorators import NodeInfo, RosDirective
 import rclpy.node
 import asyncio
@@ -17,6 +17,7 @@ class RosUseNode(RosDirective):
         node_name: Optional[str] = None,
         node_namespace: Optional[str] = None,
     ):
+        # Access dict to bypass setattr.
         self.__dict__["_param_base"] = param # Defines parameter where name and ns are looked for.
         self.__dict__["_module"] = module
         self.__dict__["_node_name"] = node_name
@@ -37,11 +38,7 @@ class RosUseNode(RosDirective):
             return setattr(self._module, name, value)
     
     def implement_server(self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop):
-        fullname = self._module.__name__
-        spec = importlib.util.find_spec(fullname)
-        clone = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(clone)
-        
+        clone = duplicate_module(self._module)
         self.__dict__["_instance"] = clone
 
         # Initialize instance.
