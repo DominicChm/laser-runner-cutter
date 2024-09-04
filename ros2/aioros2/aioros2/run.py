@@ -4,12 +4,12 @@ import threading
 from types import ModuleType
 from typing import Optional
 from .directives._decorators import RosDirective, NodeInfo
-from aioros2.util import get_caller_module, get_module_ros_directives
+from aioros2.util import get_caller_module, get_module_ros_directives, to_camel_case
 from aioros2.AioRos2Exception import AioRos2Exception
 import asyncio
-from .bootstrap import node, loop
 from rclpy.executors import Executor, MultiThreadedExecutor
 import rclpy
+from rclpy.node import Node
 
 # pip install -e laser-runner-cutter/ros2/aioros2/ --config-settings editable_mode=strict
 
@@ -18,7 +18,9 @@ import rclpy
 
 
 def run(num_threads: Optional[int] = None):
+
     # Access caller module dict to find directives
+    module_name = inspect.getmodule(inspect.stack()[1].frame).__name__.split(".").pop()
     module_dict = inspect.stack()[1].frame.f_globals
 
     directives = get_module_ros_directives(module_dict)
@@ -27,9 +29,17 @@ def run(num_threads: Optional[int] = None):
         raise AioRos2Exception(
             f"Initialized module {module_dict.__name__} does not have any ROS directives!"
         )
+    
+    rclpy.init()
+
+    loop = asyncio.get_event_loop()
+    node = Node(to_camel_case(module_name))
+
+    name = node.get_name()
+    namespace = node.get_namespace()
 
     for d in directives:
-        d.implement_server(node, NodeInfo(None, None), loop)
+        d.implement_server(node, NodeInfo(namespace, name), loop)
 
     loop.create_task(_spin([node], num_threads))
 

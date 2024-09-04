@@ -27,7 +27,7 @@ async def start():
 
 @aioros2.subscribe(onode.a_topic)
 def on_a_topic(data):
-    print("GOT")
+    print("GOT DATA", data)
 
 @aioros2.service("~/start", Trigger)
 async def start_lel() -> bool:

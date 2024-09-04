@@ -1,10 +1,13 @@
 import importlib
+import traceback
 from types import ModuleType
 from typing import Optional, TypeVar
 
 from ..util import get_module_ros_directives, duplicate_module
 from ._decorators import NodeInfo, RosDirective
 import rclpy.node
+from rclpy.parameter import Parameter
+from rclpy.exceptions import ParameterUninitializedException
 import asyncio
 from varname import varname
 uses = {}
@@ -22,7 +25,7 @@ class RosUseNode(RosDirective):
         self.__dict__["_module"] = module
         self.__dict__["_node_name"] = node_name
         self.__dict__["_node_namespace"] = node_namespace
-        self.__dict__["_instance"] = None
+        self.__dict__["_instance"] = module
 
 
     def __getattr__(self, name):
@@ -38,23 +41,33 @@ class RosUseNode(RosDirective):
             return setattr(self._module, name, value)
     
     def implement_server(self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop):
-        clone = duplicate_module(self._module)
-        self.__dict__["_instance"] = clone
 
-        # Initialize instance.
-        directives = get_module_ros_directives(clone)
+        try:
+            # Load name and namespace of referenced node from parameters
+            name_param = self._param_base + ".name"
+            namespace_param = self._param_base + ".namespace"
 
-        name = node.get_parameter_or(self._param_base + "/name", None)
-        namespace = node.get_parameter_or(self._param_base + "/ns", None)
+            node.declare_parameter(name_param, Parameter.Type.STRING)
+            node.declare_parameter(namespace_param, Parameter.Type.STRING)
+            
+            name = node.get_parameter(name_param).value
+            namespace = node.get_parameter(namespace_param).value
 
-        if not name:
-            print(f"CAN'T USE {self._param_base} BECAUSE A PARAMETER NAME WAS NOT SPECIFIED.")
-            return
-        
-        print("USE", self._param_base, name.value, namespace.value)
+            # Reinstantiate the module to get independant funcs and vars.
+            clone = duplicate_module(self._module)
+            self.__dict__["_instance"] = clone
 
-        for d in directives:
-            d.implement_server(node, NodeInfo(name, namespace), loop)
+            # Initialize the instance as a client.
+            directives = get_module_ros_directives(clone)
+
+            for d in directives:
+                d.implement_client(node, NodeInfo(namespace, name), loop)
+
+        except ParameterUninitializedException: 
+            node.get_logger().error(f"Could not link {self._param_base}"
+                                    f" because `{self._param_base}.namespace` "
+                                    f"or `{self._param_base}.name` params were "
+                                    f"uninitialized")
 
     def implement_client(self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop):
         return self._module

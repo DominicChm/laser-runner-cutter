@@ -2,8 +2,8 @@ import asyncio
 import inspect
 
 from aioros2.returnable import marshal_returnable_to_idl
-from aioros2.util import catch
-from ._decorators import RosDirective, idl_to_kwargs
+from ..util import catch, idl_to_kwargs
+from ._decorators import RosDirective
 from rclpy.node import Node
 from ..deferrable import Deferrable
 

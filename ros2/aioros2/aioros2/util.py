@@ -42,7 +42,7 @@ def get_caller_module(skip=0):
 
     return caller_module
 
-def get_module_ros_directives(d):
+def get_module_ros_directives(d) -> list[RosDirective]:
     if isinstance(d, ModuleType):
         d = d.__dict__
 
@@ -76,3 +76,7 @@ def marshal_to_idl(idl, *args, **kwargs):
         return idl(**args[0])
     
     return idl(**kwargs)
+
+def idl_to_kwargs(req):
+    msg_keys = req.get_fields_and_field_types().keys()
+    return {k: getattr(req, k) for k in msg_keys}

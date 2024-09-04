@@ -1,11 +1,11 @@
 import aioros2
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, String
 
-a_topic = aioros2.topic("lel", Bool)
+a_topic = aioros2.topic("~/talk", String)
 
 @aioros2.timer(1, True)
 async def t():
-    a_topic.pub(data=True)
+    a_topic.pub(data="Hello World!")
 
 # Boilerplate below here.
 def main():

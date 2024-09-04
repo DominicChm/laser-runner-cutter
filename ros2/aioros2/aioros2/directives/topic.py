@@ -51,7 +51,13 @@ class RosTopic(RosDirective):
         return expand_topic_name(
             self._path, self._nodeInfo.name, self._nodeInfo.namespace
         )
-
+    
+    def idl(self):
+        return self._idl
+    
+    def qos(self):
+        return self._qos
+    
     def implement_server(
         self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop
     ):
