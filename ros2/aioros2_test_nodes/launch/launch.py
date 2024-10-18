@@ -11,7 +11,10 @@ def generate_launch_description():
     talker_node = launch(
         tnd,
         output="screen",
-        emulate_tty=True,
+        emulate_tty=True, 
+        parameters=[
+            {"params.amiga_host": "test"}
+        ]
     )
 
     other_node = launch(ond, name="other_node1")

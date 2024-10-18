@@ -11,12 +11,9 @@ from ..deferrable import Deferrable
 
 
 class RosService(RosDirective):
-    def __init__(self, path: Deferrable, idl, fn):
+    def __init__(self, path: str, idl, fn):
         if not hasattr(idl, "Request"):
             raise TypeError("Passed object is not a service-compatible IDL object! Make sure it isn't a topic or action IDL.")
-        
-        if not inspect.iscoroutinefunction(fn):
-            raise TypeError("Service handler must be async")
         
         self._check_service_handler_signature(fn, idl)
 
@@ -25,6 +22,9 @@ class RosService(RosDirective):
         self._fn = fn
 
     def _check_service_handler_signature(self, fn, srv):
+        if not inspect.iscoroutinefunction(fn):
+            raise TypeError("Service handlers must be async!")
+
         fn_name = fn.__name__
         fn_inspection = inspect.signature(fn)
         fn_dict = fn_inspection.parameters
@@ -58,16 +58,13 @@ class RosService(RosDirective):
             
             return marshal_returnable_to_idl(user_return, self._idl.Response)
 
-        print(self._path.resolve())
-        # node.create_service(self._idl, self._path, cb)
+        node.create_service(self._idl, self._path, cb)
     
-    def implement_client(self, nodeinfo, loop):
+    def implement_client(self,node, nodeinfo, loop):
         pass
 
 # Decorator
 def service(path, srv_idl):
-    path = Deferrable(path)
-    
     def _service(fn):
         return RosService(path, srv_idl, fn)
 

@@ -12,34 +12,29 @@ import asyncio
 from varname import varname
 uses = {}
 
-class RosUseNode(RosDirective):    
+class RosUseNode(RosDirective):   
+    _instance = None
+    _module = None
+    _param_base = None
+    
     def __init__(
         self,
         module,
         param,
-        node_name: Optional[str] = None,
-        node_namespace: Optional[str] = None,
     ):
-        # Access dict to bypass setattr.
-        self.__dict__["_param_base"] = param # Defines parameter where name and ns are looked for.
-        self.__dict__["_module"] = module
-        self.__dict__["_node_name"] = node_name
-        self.__dict__["_node_namespace"] = node_namespace
-        self.__dict__["_instance"] = module
-
+        # Set vars like this to bypass setattr
+        vars(self).update(dict(
+            _param_base = param,
+            _module = module,
+            _instance = module
+        ))
 
     def __getattr__(self, name):
-        if self._instance:
-            return getattr(self._instance, name)
-        else:
-            return getattr(self._module, name)
+        return getattr(self._instance, name)
     
     def __setattr__(self, name: str, value: rclpy.node.Any) -> None:
-        if self._instance:
-            return setattr(self._instance, name, value)
-        else:
-            return setattr(self._module, name, value)
-    
+        return setattr(self._instance, name, value)
+
     def implement_server(self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop):
 
         try:
@@ -70,13 +65,11 @@ class RosUseNode(RosDirective):
                                     f"uninitialized")
 
     def implement_client(self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop):
-        return self._module
+        pass
 
 
 U = TypeVar('U')
 def use(
     module: U,
-    node_name: Optional[str] = None, # Will be overidden by parameters 
-    node_namespace: Optional[str] = None, # Will be overidden by parameters 
 ) -> U:
-    return RosUseNode(module, varname(), node_name, node_namespace)
+    return RosUseNode(module, varname())

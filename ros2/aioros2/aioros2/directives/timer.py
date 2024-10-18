@@ -4,10 +4,13 @@ from ._decorators import RosDirective
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
 import rclpy.node
 import asyncio
-
-
+from inspect import iscoroutinefunction
+from ..AioRos2Exception import AioRos2Exception
 class RosTimer(RosDirective):
     def __init__(self, interval, allow_concurrent_execution, fn) -> None:
+        if not iscoroutinefunction(fn):
+            raise AioRos2Exception("Timer functions MUST be async.")
+        
         self.fn = fn
         self.interval = interval
         self.allow_concurrent_execution = allow_concurrent_execution

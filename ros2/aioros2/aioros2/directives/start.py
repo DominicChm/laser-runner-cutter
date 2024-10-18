@@ -5,7 +5,7 @@ from ._decorators import RosDirective
 class RosStart(RosDirective):
     def __init__(self, fn) -> None:
         if not inspect.iscoroutinefunction(fn):
-            raise TypeError("Start function must be async")
+            raise TypeError("Start functions must be async")
 
         self.fn = fn
 

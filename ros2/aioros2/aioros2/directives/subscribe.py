@@ -1,7 +1,7 @@
 import functools
 from typing import Any, Union
 
-from aioros2.util import idl_to_kwargs
+from ..util import catch, idl_to_kwargs
 from ._decorators import RosDirective
 from .topic import RosTopic
 from rclpy.expand_topic_name import expand_topic_name
@@ -24,6 +24,8 @@ class RosSubscription(RosDirective):
         idl = self.idl
         qos = self.qos
 
+        # Get IDL, topic, and qos either explicitly or from external
+        # topic.
         if type(topic) == str:
             if not self.idl:
                 raise AioRos2Exception("An IDL must be provided for string-based subscriptions")
@@ -36,9 +38,10 @@ class RosSubscription(RosDirective):
         else:
             raise TypeError("Not a topic or string")
         
+        @catch(node.get_logger().log)
         def wrap_cb(data):
             kwargs = idl_to_kwargs(data)
-            
+
             if iscoroutinefunction(self.fn):
                 loop.create_task(self.fn(**kwargs))
             else:
@@ -47,7 +50,7 @@ class RosSubscription(RosDirective):
         node.create_subscription(idl, topic, wrap_cb ,qos)
 
     def implement_client(self, node: rclpy.node.Node, nodeinfo, loop: asyncio.BaseEventLoop):
-        return
+        return # Don't do anything with subscriptions in client nodes
 
 def subscribe(topic: Union[RosTopic, str], idl: Union[Any, None] = None, qos_queue=10):
     topic = Deferrable(topic)

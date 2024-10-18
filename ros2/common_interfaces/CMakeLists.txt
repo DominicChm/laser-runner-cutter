@@ -31,7 +31,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetBool.srv"
   "srv/SetFloat32.srv"
   "srv/SetInt32.srv"
-
+  "srv/GetInt32.srv"
 )
 
 if(BUILD_TESTING)
