@@ -1,10 +1,14 @@
 import inspect
 import asyncio
-from ._decorators import RosDirective
+from ._RosDirective import RosDirective
 
 class RosStart(RosDirective):
+    """
+    Starts the decorated function when the node is run as a server
+    """
     def __init__(self, fn) -> None:
         if not inspect.iscoroutinefunction(fn):
+            # Todo: support sync functions using executors
             raise TypeError("Start functions must be async")
 
         self.fn = fn

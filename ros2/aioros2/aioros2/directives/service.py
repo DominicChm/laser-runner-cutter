@@ -3,7 +3,7 @@ import inspect
 
 from aioros2.returnable import marshal_returnable_to_idl
 from ..util import catch, idl_to_kwargs
-from ._decorators import RosDirective
+from ._RosDirective import RosDirective
 from rclpy.node import Node
 from ..deferrable import Deferrable
 
@@ -61,6 +61,7 @@ class RosService(RosDirective):
         node.create_service(self._idl, self._path, cb)
     
     def implement_client(self,node, nodeinfo, loop):
+        # TODO: implement remote service call.
         pass
 
 # Decorator

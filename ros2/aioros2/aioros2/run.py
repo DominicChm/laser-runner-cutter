@@ -3,7 +3,7 @@ import inspect
 import threading
 from types import ModuleType
 from typing import Optional
-from .directives._decorators import RosDirective, NodeInfo
+from .directives._RosDirective import RosDirective, NodeInfo
 from aioros2.util import get_caller_module, get_module_ros_directives, to_camel_case
 from aioros2.AioRos2Exception import AioRos2Exception
 import asyncio
@@ -18,7 +18,10 @@ from rclpy.node import Node
 
 
 def run(num_threads: Optional[int] = None):
-
+    """
+    Starts the ROS node contained within the calling file.
+    Should only be called from within if __name__ == "__main__".
+    """
     # Access caller module dict to find directives
     module_name = inspect.getmodule(inspect.stack()[1].frame).__name__.split(".").pop()
     module_dict = inspect.stack()[1].frame.f_globals
@@ -29,7 +32,7 @@ def run(num_threads: Optional[int] = None):
         raise AioRos2Exception(
             f"Initialized module {module_dict.__name__} does not have any ROS directives!"
         )
-    
+
     rclpy.init()
 
     loop = asyncio.get_event_loop()
@@ -84,14 +87,13 @@ async def _spin(nodes, num_threads: Optional[int] = None):
         node.destroy_guard_condition(cancels[idx])
 
 
-def process_imports(module):
-    imports = get_module_ros_imports(module)
-
-    for i in imports:
-        print("imports", imports)
-
-
 def get_module_ros_imports(d):
+    """
+    Returns all found imports which are aioros nodes.
+
+    Any Python file which contains exported aioros directives is treated
+    as an aioros node.
+    """
     if isinstance(d, ModuleType):
         d = d.__dict__
 

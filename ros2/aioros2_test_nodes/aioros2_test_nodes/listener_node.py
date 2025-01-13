@@ -20,7 +20,7 @@ async def increment():
     counter += 1
     return {"data": counter}
 
-@aioros2.subscribe(talker.)
+@aioros2.subscribe(talker.topic_test)
 # Boilerplate below here.
 def main():
     aioros2.run()

@@ -47,6 +47,24 @@ class Aioros2LaunchDescription(Node):
         self.__init_rclpy_node()
 
     def __register_link(self, name, node):
+        """
+        Sets parameters on the launch node which are later used during startup to 
+        resolve node relationships. 
+        
+        In a node "foo" which contains:
+        `bar1 = use(import bar)`
+
+        and launched with
+        ```
+        foo = launch(import foo, ...)
+        bar = launch(import bar, name="bar_name", namespace="bar_ns")
+        foo.bar1 = bar
+        ```
+
+        this function should set these parameters on the foo node
+        "bar1.name" = "bar_name"
+        "bar1.namespace" = "bar_ns"
+        """
         if not isinstance(node, Node):
             raise AttributeError("`use` directives must be linked to an rclpy node.")
 
@@ -59,6 +77,10 @@ class Aioros2LaunchDescription(Node):
         self.__init_rclpy_node()
 
     def __setattr__(self, name: str, value: Any) -> None:
+        """
+        Overrides setattr for any module variable which is a use(...) statement.
+        Used to allow setting linkage within launch files.
+        """
         if hasattr(self.__instance, name):
             if isinstance(getattr(self.__instance, name), RosUseNode):
                 self.__register_link(name, value)
@@ -77,6 +99,11 @@ T = TypeVar("T")
 
 
 def launch(module: T, *args, **kwargs) -> T:
+    """
+    Creates an rclpy-compatible launch description with utilities for linkage.
+
+    args and kwargs are same as rclpy launch node.
+    """
     if len(args) > 0:
         raise TypeError("More positional args passed than expected. Use keyword args.")
 

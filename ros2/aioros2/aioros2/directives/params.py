@@ -1,5 +1,5 @@
 from typing import TypeVar
-from ._decorators import RosDirective, NodeInfo
+from ._RosDirective import RosDirective, NodeInfo
 import dataclasses
 import rclpy.node
 import asyncio

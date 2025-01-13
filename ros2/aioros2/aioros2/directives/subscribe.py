@@ -2,7 +2,7 @@ import functools
 from typing import Any, Union
 
 from ..util import catch, idl_to_kwargs
-from ._decorators import RosDirective
+from ._RosDirective import RosDirective
 from .topic import RosTopic
 from rclpy.expand_topic_name import expand_topic_name
 from ..deferrable import Deferrable
